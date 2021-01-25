@@ -1,0 +1,44 @@
+version: '3.1'
+services:
+  web:
+    build: ./web
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    networks:
+      - counter
+    volumes:
+      -  ./frame_data:/data/web
+      - ./configweb:/data/configweb
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+      - ./configdb:/data/configdb
+    networks:
+      - counter
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    depends_on:
+      - mongo
+    networks:
+      - counter
+networks:
+  counter:
+    external: true
+    
+    
