@@ -11,21 +11,12 @@ import io
 import os
 from dotenv import load_dotenv
 import numpy as np
-project_folder = os.path.expanduser(
-    '~/nodejs/customerCounter/API_count/web/')  # adjust as appropriate
-load_dotenv(os.path.join(project_folder, '.env'))
 
-#Mongo URI 
-# uri = os.environ.get('URI')
 # create clinet for mongo db 
 client = MongoClient('mongo', 27017)
 db = client.aNewDB
 CustomerCounter = db["Counter"]
-# instanciate flask app 
-# sio = socketio.Server(async_mode = 'threading', logger=True,
-#                       async_handlers=True, always_connect=True)
 app = Flask(__name__)
-# app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
 CORS(app)
 
 
@@ -38,21 +29,6 @@ def time():
     date = d.now()
     date_now = date.strftime("%Y-%m-%d %H:%M:%S")
     return date_now
-# def save(frame):
-#     date = time()
-#     image_bin = base64.b64decode(frame)
-#     # print(image_bin)
-#     jpg_as_np = np.frombuffer(image_bin, dtype=np.uint8)
-#     img = cv2.imdecode(jpg_as_np, cv2.IMREAD_ANYCOLOR)
-#     if img.size :
-#         print("we supposed to be writting an image")
-#         cv2.imwrite('frame'+str(date)+'.jpg', img)
-
-
-
-
-
-
 
 class Count(Resource):
     def post(self):
@@ -68,8 +44,6 @@ class Count(Resource):
             "count": postedData["count"],
             
         })
-        
-        
         retjson = {
             "Message": "Successfully stored the count",
             "Status": 200
@@ -81,22 +55,11 @@ class Retrieve(Resource):
 
         # get posted data 
         postedData = request.get_json()
-        print(postedData)
-
-        # if len(Object.values(postedData)) == 1:
-        #     data = db.Counter.find({"timestamp": {"$gte": "2016-03-07 11:33:48", "$lt": "2016-03-07 11:34:48"}})
-
-
+       
         # retrieve the data accoording to the queries 
         print(postedData)
         querie = {"$gte": postedData["date"][0], "$lt": postedData["date"][1]}
-        
-        # data = db.Counter.aggregate(
-        #     {"timestamp":querie}
 
-            
-        #     )
-        # print(list(data))
         data = list(db.Counter.aggregate([
             {"$match": {
                 "timestamp": querie,
@@ -105,8 +68,6 @@ class Retrieve(Resource):
             {"$unset": ["_id"]}
             ]))
         
-        # print(data)
-
         retjson = {
             "Message": "you have successfully retrived all the data",
             "Status": 200,
@@ -195,11 +156,6 @@ class Save_video(Resource):
         }
 
         return jsonify(retjson)
-
-
-
-        
-
 
 api.add_resource(Count, "/store", methods=['GET', 'POST'])
 api.add_resource(Retrieve, "/retrieve", methods=['GET', 'POST'])
